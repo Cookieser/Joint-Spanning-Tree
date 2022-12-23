@@ -1,0 +1,7 @@
+# ninja log v5
+546	650	6934962191089267	Socket.exe	1522dea70d5dffc
+7	513	6934964280297203	CMakeFiles/Joint_spanning_tree.dir/Node.cpp.obj	f3ccb6b0bec3ec6a
+3	613	6934964281294534	CMakeFiles/Joint_spanning_tree.dir/Prims.cpp.obj	2c71276db19fbc10
+0	660	6934964281763283	CMakeFiles/Joint_spanning_tree.dir/Graph.cpp.obj	86f7652628c1732f
+5	767	6934964282830430	CMakeFiles/Joint_spanning_tree.dir/main.cpp.obj	c6485418b826791e
+767	909	6934964284226700	Joint_spanning_tree.exe	5f7528b97b9b5063
