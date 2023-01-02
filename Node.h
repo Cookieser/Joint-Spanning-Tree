@@ -14,7 +14,7 @@ struct neighbourNodes{
 };
 
 #define FINISHED 1
-#define UNFINISHED 0
+#define UNFINISHED -1
 
 class Node {
 private:
@@ -30,7 +30,7 @@ public:
     std::vector <neighbourNodes> _NeighbourNodes;
 
     Node(int id,std::vector <neighbourNodes> Nodes){
-        this -> _status = 0;
+        this -> _status = UNFINISHED;
         this -> _id = id;
         this -> _NeighbourNodes = Nodes;
         this -> _neighbourNum = _NeighbourNodes.size();
@@ -56,7 +56,7 @@ public:
     void setStatus(int s);
     void printAllStatusAround();
 
-    void minWeightUnfinished(int &min,int &route);
+    void minWeightUnfinished(int &min,int &route,vector<int> inFragment,int &extendNode);
     void updateStatusOfNeighbour(int id,int s);
 
 

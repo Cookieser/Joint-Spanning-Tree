@@ -49,11 +49,11 @@ class Graph {
     // 将node进行初始化
      void distribute();
 
-     void findStatusById(int id);
+     int findStatusById(int id);
 
-     //void findAllFinishedNodes();
+    void findAllNodesByStatus(int s,std::vector <int>&res);
      void setNodeStatus(int id,int s);
 
-     void wakeup(int id);
+     void wakeup(int id,int status);
 };
 

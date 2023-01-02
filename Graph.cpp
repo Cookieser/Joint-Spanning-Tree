@@ -48,14 +48,15 @@ void Graph::printListNodes() {
     }
 
 
-void Graph::findStatusById(int id) {
+int Graph::findStatusById(int id) {
 
     Node n = VectorNodes[id];
-    cout << n.getStatus() << endl;
+    return n.getStatus();
 }
 
 
 void Graph::setNodeStatus(int id,int s){
+
     Node &n = VectorNodes[id];
 
     n.setStatus(s);
@@ -67,15 +68,28 @@ void Graph::setNodeStatus(int id,int s){
         if(weight!=0) {
             Node &node = VectorNodes[i];
             node.updateStatusOfNeighbour(id,s);
-            cout <<"Notified the "<< i <<" to update status"<<endl;
+            //cout <<"Notified the "<< i <<" to update status"<<endl;
         }
 
     }
 }
-void Graph::wakeup(int id){
+void Graph::wakeup(int id,int status){
 
     cout << "Hello!! Wakeup " << id <<endl;
-    setNodeStatus(id,1);
+    setNodeStatus(id,status);
+
+
+}
+
+
+void Graph::findAllNodesByStatus(int s,std::vector <int>&res){
+    for (int i = 0; i < _num; ++i) {
+        if(VectorNodes[i].getStatus()==s){
+            res.push_back(VectorNodes[i].getID());
+        }
+
+    }
+
 
 
 }

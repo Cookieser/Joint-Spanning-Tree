@@ -23,6 +23,7 @@ void Node::setNeighbourNode(int node,int weight,int status){
 }
 
 void Node::setStatus(int s){
+    cout <<"Start to change the status of Node"<<_id<<endl;
 
     if(_status != s)
     {
@@ -33,24 +34,39 @@ void Node::setStatus(int s){
     {
         cout<<"The status of "<< getID() <<" isn't changed" << endl;
     }
-
+    cout<<endl;
     }
 
 
+// 寻找一个点周围不属于其片段的最佳边
+void  Node::minWeightUnfinished(int &min,int &route,vector<int> inFragment,int &extendNode){
 
-void  Node::minWeightUnfinished(int &min,int &route){
+    int st;
 
-    cout <<_id<<" starts to min process" <<endl;
+
+    cout<<"minWeightUnfinishe() for "<<_id<<", which has "<<inFragment.size()<< " nodes in their fragment."<<endl;
+
+    bool flag= false;
 
     for (vector<neighbourNodes>::iterator it = _NeighbourNodes.begin();it !=_NeighbourNodes.end();it++) {
-        if(((it->status)==0)&&(it->weight < min))
+        flag = false;
+        for (int i = 0; i < inFragment.size(); ++i) {
+            //如果邻居节点属于其大片段，则标注为true
+            if((it->status)==inFragment[i]) flag= true;
+        }
+        if((flag== false)&&(it->weight < min))
         {
             min = it->weight;
             route = it->node;
+            st = it->status;
+            extendNode = _id;
 
+            cout<<"min: "<<min<<"\t id: "<<route<<endl;
         }
 
+
     }
+    return ;
 
 }
 

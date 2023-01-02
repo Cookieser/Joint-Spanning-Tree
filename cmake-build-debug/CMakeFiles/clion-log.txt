@@ -1,4 +1,0 @@
-"E:\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=E:/JetBrains/CLion 2022.2.3/bin/ninja/win/ninja.exe" -G Ninja -S "D:\Code\Stage2\Joint spanning tree" -B "D:\Code\Stage2\Joint spanning tree\cmake-build-debug"
--- Configuring done
--- Generating done
--- Build files have been written to: D:/Code/Stage2/Joint spanning tree/cmake-build-debug
