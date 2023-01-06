@@ -9,39 +9,27 @@
 #include "Graph.h"
 #include "Prims.h"
 
+#include<windows.h>
 using namespace std;
 
+
+
+
 int number_of_nodes;
-mutex mutex1;
-mutex mutex3;
-mutex mutex2;
+mutex mutexM;
+mutex mutexP;
 int threadNum=6;
-void printPool(vector<vector<int>> vec){
-    vector<int>::iterator it;
-    vector<vector<int>>::iterator iter;
-    vector<int> vec_tmp;
-
-    cout<<endl;
-    cout<<"------------------------------------"<<endl;
-    cout<<"pool:"<<endl;
-    int i = 0;
-    for(iter = vec.begin(); iter != vec.end(); iter++)
-    {
-        vec_tmp = *iter;
-        cout<<"["<<i++<<"]: ";
-        for(it = vec_tmp.begin(); it != vec_tmp.end(); it++)
-            cout << *it << " ";
-        cout << endl;
-    }
-    cout<<"------------------------------------"<<endl;
-}
 
 
-void func1(Graph &g,vector<vector<int>> &pool,int wakeupNode,vector<int> &res) {
+
+void func1(Graph &g,int wakeupNode) {
     //lock_guard<mutex> lk(mutex1);
     vector <int> r_weigh;
 
     vector <int> r_route;
+
+    vector<vector<int>> &pool=g.pool;
+    vector<int> &res =g.res;
 
     vector <int> &inFragment=pool[wakeupNode];
 
@@ -51,85 +39,76 @@ void func1(Graph &g,vector<vector<int>> &pool,int wakeupNode,vector<int> &res) {
 
     int extendNode;
 
-
-
+    // 初始化唤醒
     r_route.push_back(wakeupNode);
 
-    //需要注意的共享数据类型有：g以及pool
-
-    //wakeup操作
-    //lock1
-    mutex1.lock();
-
-    g.setNodeStatus(id,wakeupNode);
-    inFragment.push_back(id);
-
-    mutex1.unlock();
+    mutexM.lock();
+    if(g.findStatusById(id)==UNFINISHED) {
+        g.setNodeStatus(id, wakeupNode);
+        inFragment.push_back(id);
+    }else
+    {
+        cout<<"Have finished"<<endl;
+    }
 
 
-
-    for (int i = 0; i < number_of_nodes; ++i) {
+    mutexM.unlock();
 
 
 
+    for (int i = 0; i < number_of_nodes+2; ++i) {
+
+
+        mutexP.lock();
         g.printListNodes();
-        printPool(pool);
+        g.printPool();
+        mutexP.unlock();
 
-        min = INT_MAX;
-        id = INT_MAX;
+        mutexM.lock();
 
         //遍历片段中的点，更新出最小值
-        mutex3.lock();
-        for (int j = 0; j < inFragment.size(); ++j) {
-            //cout<<"r_route["<<j<<"]"<<r_route[j]<<endl;
 
-            int nodeId = inFragment[j];
-
-            g.VectorNodes[nodeId].minWeightUnfinished(min,id,inFragment,extendNode);
-
-            cout<<wakeupNode<<"main: min: "<<min<<"\t id: "<<id<<"\t"<<extendNode<<endl;
-
-        }
+        g.findMinPresentById(wakeupNode,min,id,extendNode);
 
         r_route.push_back(id);
         r_weigh.push_back(min);
 
 
-
+        // 判断是否终止
         if(min == INT_MAX)
         {
             cout << "Finished!!!" << endl;
-            mutex3.unlock();
+            mutexM.unlock();
+            break;
+        }
+
+        if(g.findClassById(id)){
+           cout<<"Connect the Common Node"<<id<<endl;
+           cout<<"Inter the New world"<<endl;
+            Sleep(10);
             break;
         }
 
 
-        // 判断是否终止
 
-        bool flag2= false;
-        for (int k = 0; k < inFragment.size(); ++k) {
-
-            if(id==inFragment[k]) flag2= true;
-
-        }
-
-
-
-        if((flag2== false)&&(g.findStatusById(id)!=UNFINISHED)){
+        //判断：如果已经完成，就直接合并
+        if(g.findStatusById(id)!=UNFINISHED){
 
             int st=g.findStatusById(id);
+            mutexP.lock();
             cout<<"Merged by "<<id<<", which is in status "<< st <<endl;
+
+            mutexP.unlock();
             for (int l = inFragment.size()-1; l >= 0; --l) {
                 int tmp = inFragment[l];
+                g.setNodeStatus(tmp,st);
                 pool[st].push_back(tmp);
                 inFragment.pop_back();
 
             }
+            mutexP.lock();
             cout<<"This thread should be stopped here!!!"<<endl;
             cout << endl;
-
-
-            //lock
 
             for (int j = 0; j < r_route.size()-2; ++j) {
 
@@ -141,49 +120,27 @@ void func1(Graph &g,vector<vector<int>> &pool,int wakeupNode,vector<int> &res) {
             res.push_back(extendNode);
             res.push_back(id);
             cout<<endl;
-            mutex3.unlock();
+            mutexP.unlock();
+            mutexM.unlock();
             return;
 
         }
 
-
+        //判断：未完成的比较简单，直接记录并修改即可
         res.push_back(extendNode);
         res.push_back(id);
         g.setNodeStatus(id,wakeupNode);
         inFragment.push_back(id);
 
-        mutex3.unlock();
+        mutexM.unlock();
 
 
     }
 
-
-    cout << endl;
-    for (int i = 0; i < r_route.size()-2; ++i) {
-        cout << r_route[i]<<" - "<<r_route[i+1] << "\t"
-             << r_weigh[i] <<endl;
-
-    }
-
-    //mutex2.unlock();
     return;
 
 
 }
-
-
-void printRes(vector<int> res){
-
-    cout<<"------------------------------------"<<endl;
-    cout<<"Res: "<<endl;
-    for (int i = 0; i < (res.size()/2); ++i) {
-        cout<<res[i*2]<<" - "<<res[i*2+1]<<endl;
-    }
-
-    cout<<"------------------------------------"<<endl;
-
-}
-
 
 
 
@@ -206,22 +163,9 @@ vector<int> create(){
 
 }
 
+
+
 int main (void) {
-
-    vector<vector<int>> pool;
-
-    vector<int> res;
-
-
-    for (int i = 0; i < threadNum; ++i) {
-        vector<int> vector;
-
-        pool.push_back(vector);
-
-    }
-
-    printPool(pool);
-
 
     vector<int>graph=create();
 
@@ -229,31 +173,41 @@ int main (void) {
 
     g -> distribute();
 
+    g -> initPool(threadNum);
+
+    g -> printPool();
+
     g -> printListNodes();
+
 
 
     //g ->setNodeStatus(2,2);
 
-    std::thread thread1(func1,ref(*g),ref(pool),1,ref(res));
-    std::thread thread2(func1,ref(*g),ref(pool),5,ref(res));
-    std::thread thread3(func1,ref(*g),ref(pool),2,ref(res));
+    //g->setNodeClass(0);
+
+    std::thread thread1(func1,ref(*g),1);
+    std::thread thread2(func1,ref(*g),5);
+    std::thread thread3(func1,ref(*g),2);
+
+
     thread1.join();
     thread2.join();
     thread3.join();
 
-    //func1(*g,pool,3,res);
 
-    printRes(res);
 
-    printPool(pool);
+    g->printRes();
+
+    g->printPool();
+
 
     cout<<"-------------------------"<<endl;
+
     Prims *prims=new Prims(graph);
 
     prims -> findMst();
 
     prims->printMst();
-
 
 
 }

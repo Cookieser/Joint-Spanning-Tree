@@ -21,6 +21,7 @@ private:
     int _status;
     int _id;
     int _neighbourNum;
+    bool _class;
 
 
 
@@ -34,6 +35,7 @@ public:
         this -> _id = id;
         this -> _NeighbourNodes = Nodes;
         this -> _neighbourNum = _NeighbourNodes.size();
+        this ->_class = false;
     }
 
 
@@ -43,6 +45,9 @@ public:
     }
     int getID(){
         return _id;
+    }
+    bool getClass(){
+        return _class;
     }
 
     int getNeighbourNum(){
@@ -54,6 +59,7 @@ public:
     void setNeighbourNode(int node,int weight,int status);
 
     void setStatus(int s);
+    void setClass();
     void printAllStatusAround();
 
     void minWeightUnfinished(int &min,int &route,vector<int> inFragment,int &extendNode);

@@ -1,7 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
-
 #include "Graph.h"
 
 using namespace std;
@@ -54,6 +52,12 @@ int Graph::findStatusById(int id) {
     return n.getStatus();
 }
 
+bool Graph::findClassById(int id) {
+
+    Node n = VectorNodes[id];
+    return n.getClass();
+}
+
 
 void Graph::setNodeStatus(int id,int s){
 
@@ -68,28 +72,76 @@ void Graph::setNodeStatus(int id,int s){
         if(weight!=0) {
             Node &node = VectorNodes[i];
             node.updateStatusOfNeighbour(id,s);
-            //cout <<"Notified the "<< i <<" to update status"<<endl;
+
         }
 
     }
 }
-void Graph::wakeup(int id,int status){
 
-    cout << "Hello!! Wakeup " << id <<endl;
-    setNodeStatus(id,status);
 
+void  Graph::setNodeClass(int id) {
+    Node &n = VectorNodes[id];
+    n.setClass();
 
 }
 
+void Graph::printRes(){
+    cout<<"------------------------------------"<<endl;
+    cout<<"Res: "<<endl;
+    for (int i = 0; i < (res.size()/2); ++i) {
+        cout<<res[i*2]<<" - "<<res[i*2+1]<<endl;
+    }
 
-void Graph::findAllNodesByStatus(int s,std::vector <int>&res){
-    for (int i = 0; i < _num; ++i) {
-        if(VectorNodes[i].getStatus()==s){
-            res.push_back(VectorNodes[i].getID());
-        }
+    cout<<"------------------------------------"<<endl;
+
+}
+
+void Graph::printPool(){
+    vector<vector<int>> &vec=pool;
+    vector<int>::iterator it;
+    vector<vector<int>>::iterator iter;
+    vector<int> vec_tmp;
+
+    cout<<endl;
+    cout<<"------------------------------------"<<endl;
+    cout<<"pool:"<<endl;
+    int i = 0;
+    for(iter = vec.begin(); iter != vec.end(); iter++)
+    {
+        vec_tmp = *iter;
+        cout<<"["<<i++<<"]: ";
+        for(it = vec_tmp.begin(); it != vec_tmp.end(); it++)
+            cout << *it << " ";
+        cout << endl;
+    }
+    cout<<"------------------------------------"<<endl;
+}
+
+void Graph::initPool(int threadNum ) {
+
+    for (int i = 0; i < threadNum; ++i) {
+        vector<int> vector;
+        pool.push_back(vector);
 
     }
 
+}
 
+void  Graph::findMinPresentById(int wakeupNode,int &min,int &id,int &extendNode){
+    vector <int> &inFragment=pool[wakeupNode];
+    min = INT_MAX;
+    id = INT_MAX;
 
+    //遍历片段中的点，更新出最小值
+
+    for (int i = 0; i < inFragment.size(); ++i) {
+
+        int nodeId = inFragment[i];
+        mutexP.lock();
+
+        VectorNodes[nodeId].minWeightUnfinished(min,id,inFragment,extendNode);
+
+        cout<<"main: min: "<<min<<"\t id: "<<id<<"\t"<<extendNode<<endl;
+        mutexP.unlock();
+    }
 }

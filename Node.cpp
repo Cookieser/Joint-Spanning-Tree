@@ -38,13 +38,13 @@ void Node::setStatus(int s){
     }
 
 
-// 寻找一个点周围不属于其片段的最佳边
+// 寻找除去同片段节点后某点的最小权重边
 void  Node::minWeightUnfinished(int &min,int &route,vector<int> inFragment,int &extendNode){
 
     int st;
 
 
-    cout<<"minWeightUnfinishe() for "<<_id<<", which has "<<inFragment.size()<< " nodes in their fragment."<<endl;
+    cout<<"minWeightUnfinished() for "<<_id<<", which has "<<inFragment.size()<< " nodes in their fragment."<<endl;
 
     bool flag= false;
 
@@ -87,4 +87,11 @@ void Node::updateStatusOfNeighbour(int id,int s){
     }
 
  cout<<"Not found the neighbour in this node "<<endl;
+}
+
+void Node::setClass() {
+    _class= true;
+    cout<<"Set the Node "<<_id<<" to be common Node."<<endl;
+
+
 }
